@@ -21,4 +21,9 @@ public abstract class DataSet {
 	public abstract int update(SQLiteDatabase database, Uri uri, ContentValues values,
 			String selection, String[] selectionArgs);
 
+	public abstract void onCreate(SQLiteDatabase db);
+
+	public abstract void onUpgrade(final SQLiteDatabase db, final int oldVersion, final int newVersion);
+	
+	public abstract void drop(SQLiteDatabase db);
 }

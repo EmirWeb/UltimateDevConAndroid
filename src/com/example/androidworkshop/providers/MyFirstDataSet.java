@@ -7,6 +7,7 @@ import android.net.Uri;
 
 public class MyFirstDataSet extends DataSet{
 	
+	@Override
 	public void onCreate(final SQLiteDatabase db){
 		final String query = 	"CREATE TABLE People " +
 				"( " +
@@ -16,6 +17,12 @@ public class MyFirstDataSet extends DataSet{
 				"	Address varchar(255), " +
 				"	City varchar(255) " +
 				");";
+		db.execSQL(query);
+	}
+	
+	@Override
+	public void drop(final SQLiteDatabase db){
+		final String query = "DROP TABLE IF EXISTS People";
 		db.execSQL(query);
 	}
 
@@ -50,6 +57,10 @@ public class MyFirstDataSet extends DataSet{
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	
 
+	@Override
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		drop(db);
+		onCreate(db);
+	}
 }

@@ -20,7 +20,7 @@ public class MyContentProvider extends ContentProvider {
 	protected void createDatabase() {
 		synchronized (LOCK) {
 			if (sDatabase == null) {
-				final Database database = new Database(getContext(), "MyDatabase", null, 1);
+				final Database database = new Database(getContext(), "MyDatabase", dataSets);
 				sDatabase = database.getWritableDatabase();
 			}
 		}
@@ -93,7 +93,8 @@ public class MyContentProvider extends ContentProvider {
 	@Override
 	public boolean onCreate() {
 		// Register a bunch of data sets
-		registerDataSet(Uri.parse("SomeUri"),new MyFirstDataSet());
+		registerDataSet(Uri.parse("FirstDataSet"),new MyFirstDataSet());
+		registerDataSet(Uri.parse("SecondDataSet"),new MyFirstDataSet());
 		return false;
 	}
 
