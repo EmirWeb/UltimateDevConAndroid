@@ -13,9 +13,11 @@ import android.net.Uri;
 public class MyContentProvider extends ContentProvider {
 
 	private static final Object LOCK = new Object();
-	private HashMap<Uri, DataSet> dataSets;
-	private HashMap<Uri, String> validators;
+	private static HashMap<Uri, DataSet> dataSets;
+	private static HashMap<Uri, String> validators;
 	private static SQLiteDatabase sDatabase;
+	
+	public static Uri sMyFirstDatasetURI;
 	
 	protected void createDatabase() {
 		synchronized (LOCK) {
@@ -93,7 +95,8 @@ public class MyContentProvider extends ContentProvider {
 	@Override
 	public boolean onCreate() {
 		// Register a bunch of data sets
-		registerDataSet(Uri.parse("FirstDataSet"),new MyFirstDataSet());
+		sMyFirstDatasetURI = Uri.parse("FirstDataSet");
+		registerDataSet(sMyFirstDatasetURI,new MyFirstDataSet());
 		registerDataSet(Uri.parse("SecondDataSet"),new MyFirstDataSet());
 		return false;
 	}

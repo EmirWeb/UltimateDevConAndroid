@@ -26,7 +26,7 @@ public class Database extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		for (final DataSet dataset: mDataSets.values()) {
-			dataset.onUpgrade(db);
+			dataset.onUpgrade(db, 0, 0);
 		}
 	}
 	

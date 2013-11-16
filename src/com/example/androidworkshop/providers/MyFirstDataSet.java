@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
+import com.example.androidworkshop.models.MyFirstModel;
+
 public class MyFirstDataSet extends DataSet{
 	
 	@Override
@@ -62,5 +64,15 @@ public class MyFirstDataSet extends DataSet{
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		drop(db);
 		onCreate(db);
+	}
+
+	public static ContentValues getContentValues(MyFirstModel item) {
+		final ContentValues value = new ContentValues();
+        value.put("P_ID", item.getP_Id());
+        value.put("FirstName", item.getFirstName());
+        value.put("LastName", item.getLastName());
+        value.put("Address", item.getAddress());
+        value.put("City", item.getCity());
+        return value;
 	}
 }
