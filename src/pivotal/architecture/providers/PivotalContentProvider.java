@@ -5,6 +5,7 @@ import java.util.Locale;
 import pivotal.architecture.PivotalApplication;
 import pivotal.workshop.database.Database;
 import pivotal.workshop.database.PivotalTable;
+import pivotal.workshop.database.PivotalView;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -44,8 +45,9 @@ public class PivotalContentProvider extends ContentProvider {
 		int match = mURIMatcher.match(uri);
 		switch (match) {
 		case PivotalTable.CODE:
-			Log.d(PivotalApplication.DEBUG_TAG, "getTableName: " + PivotalTable.TABLE_NAME);
 			return PivotalTable.TABLE_NAME;
+		case PivotalView.CODE:
+			return PivotalView.VIEW_NAME;
 		}
 		return null;
 	}
@@ -86,6 +88,7 @@ public class PivotalContentProvider extends ContentProvider {
 	public boolean onCreate() {
 		Log.d(PivotalApplication.DEBUG_TAG, "onCreate");
 		mURIMatcher.addURI(AUTHORITY, PivotalTable.URI_PATH, PivotalTable.CODE);
+		mURIMatcher.addURI(AUTHORITY, PivotalView.URI_PATH, PivotalView.CODE);
 		return true;
 	}
 

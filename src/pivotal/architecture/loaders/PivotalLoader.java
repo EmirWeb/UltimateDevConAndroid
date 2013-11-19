@@ -2,6 +2,7 @@ package pivotal.architecture.loaders;
 
 import pivotal.architecture.PivotalApplication;
 import pivotal.workshop.database.PivotalTable;
+import pivotal.workshop.database.PivotalView;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.CursorLoader;
@@ -25,9 +26,7 @@ public class PivotalLoader extends CursorLoader {
 	public Cursor loadInBackground() {
 		final Context context = getContext();
 		final ContentResolver contentResolver = context.getContentResolver();
-		Log.d(PivotalApplication.DEBUG_TAG, "PivotalDataSet.URI: " + PivotalTable.URI.toString());
-		final Cursor cursor = contentResolver.query(PivotalTable.URI, null, null, null, null);
-		Log.d(PivotalApplication.DEBUG_TAG, "cursor: " + cursor);
+		final Cursor cursor = contentResolver.query(PivotalView.URI, null, null, null, null);
 		return cursor;
 	}
 	

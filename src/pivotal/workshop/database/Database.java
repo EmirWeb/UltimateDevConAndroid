@@ -8,8 +8,10 @@ import android.util.Log;
 
 public class Database extends SQLiteOpenHelper {
 
+	private static final int DATABASE_VERSION = 2;
+
 	public Database(Context context, String name) {
-		super(context, name, null, 1);
+		super(context, name, null, DATABASE_VERSION);
 	}
 
 	@Override
@@ -18,6 +20,9 @@ public class Database extends SQLiteOpenHelper {
 		db.execSQL(PivotalTable.DROP);
 		db.execSQL(PivotalTable.CREATE);
 		db.execSQL(PivotalTable.DATA_CREATE);
+
+		db.execSQL(PivotalView.DROP);
+		db.execSQL(PivotalView.CREATE);
 	}
 
 	@Override
