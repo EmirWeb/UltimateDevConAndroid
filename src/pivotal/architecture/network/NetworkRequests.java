@@ -1,4 +1,4 @@
-package com.example.androidworkshop.network;
+package pivotal.architecture.network;
 
 import java.io.IOException;
 
