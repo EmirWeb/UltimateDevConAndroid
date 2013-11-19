@@ -1,24 +1,27 @@
 package pivotal.architecture.loaders;
 
 import pivotal.architecture.PivotalApplication;
-import pivotal.workshop.database.PivotalTable;
-import pivotal.workshop.database.PivotalView;
+import pivotal.workshop.database.PivotalTasksTable;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.database.Cursor;
+import android.net.Uri;
 import android.util.Log;
 
-public class PivotalLoader extends CursorLoader {
+public class PivotalTaskLoader extends CursorLoader {
 
-	public PivotalLoader(Context context) {
+	private final Uri mUri;
+
+	public PivotalTaskLoader(Context context, final Uri uri) {
 		super(context);
+		mUri = uri;
 	}
-	
+
 	@Override
 	protected void onStartLoading() {
 		Log.d(PivotalApplication.DEBUG_TAG, "onStartLoading");
-		
+
 		super.onStartLoading();
 	}
 
@@ -26,8 +29,10 @@ public class PivotalLoader extends CursorLoader {
 	public Cursor loadInBackground() {
 		final Context context = getContext();
 		final ContentResolver contentResolver = context.getContentResolver();
-		final Cursor cursor = contentResolver.query(PivotalView.URI, null, null, null, null);
+		final String whereClause = PivotalTasksTable.Columns.URI + "=?";
+		final String[] whereArguments = new String[] { mUri.toString() };
+		final Cursor cursor = contentResolver.query(PivotalTasksTable.URI, null, whereClause, whereArguments, null);
 		return cursor;
 	}
-	
+
 }

@@ -1,53 +1,77 @@
 package pivotal.architecture.activities;
 
-import pivotal.architecture.PivotalApplication;
 import pivotal.architecture.R;
 import pivotal.architecture.adapters.PivotalCursorAdapter;
-import pivotal.architecture.loaders.PivotalLoader;
+import pivotal.architecture.callbacks.PivotalCursorLoaderCallbacks;
+import pivotal.architecture.loaders.PivotalPeopleCursorLoader;
+import pivotal.architecture.loaders.PivotalPeopleTaskCursorLoader;
+import pivotal.workshop.database.PivotalTasksTable;
 import android.app.Activity;
-import android.app.LoaderManager;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.Window;
 import android.widget.ListView;
+import android.widget.Toast;
 
-public class PivotalActivity extends Activity implements LoaderCallbacks<Cursor> {
-	
-	private static final int LOADER_ID = 1;
+public class PivotalActivity extends Activity implements PivotalCursorLoaderCallbacks {
+
 	private ListView mListView;
-	
+	private PivotalPeopleCursorLoader mPeopleCursorLoader;
+	private PivotalPeopleTaskCursorLoader mPivotalPeopleTaskCursorLoader;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.activity_pivotal);
 		super.onCreate(savedInstanceState);
 		mListView = (ListView) findViewById(R.id.activity_pivotal_list_view);
-	}
-
-	protected void onResume() {
-		super.onResume();
-		final LoaderManager loaderManager = getLoaderManager();
-		loaderManager.initLoader(LOADER_ID, null, this);
+		mPeopleCursorLoader = new PivotalPeopleCursorLoader(getApplicationContext(), getLoaderManager(), this);
+		mPivotalPeopleTaskCursorLoader = new PivotalPeopleTaskCursorLoader(getApplicationContext(), getLoaderManager(), this);
 	}
 
 	@Override
-	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-		Log.d(PivotalApplication.DEBUG_TAG, "LOADER_ID == id: " + (LOADER_ID == id));
-		if (LOADER_ID == id)
-			return new PivotalLoader(getApplicationContext());
-		return null;
+	protected void onStart() {
+		super.onStart();
+		mPeopleCursorLoader.onStart(getApplicationContext());
+		mPivotalPeopleTaskCursorLoader.onStart(getApplicationContext());
+	}
+
+	@Override
+	protected void onStop() {
+		mPeopleCursorLoader.onStop(getApplicationContext());
+		mPivotalPeopleTaskCursorLoader.onStop(getApplicationContext());
+		super.onStop();
 	}
 
 	@Override
 	public void onLoadFinished(final Loader<Cursor> loader, final Cursor cursor) {
-		final PivotalCursorAdapter pivotalCursorAdapter = new PivotalCursorAdapter(getApplicationContext(), cursor);
-		mListView.setAdapter(pivotalCursorAdapter);
-		Log.d(PivotalApplication.DEBUG_TAG, "cursor.getCount(): " + cursor.getCount());
+		if (loader instanceof PivotalPeopleCursorLoader) {
+			final PivotalCursorAdapter pivotalCursorAdapter = new PivotalCursorAdapter(getApplicationContext(), cursor);
+			mListView.setAdapter(pivotalCursorAdapter);
+		} else if (loader instanceof PivotalPeopleTaskCursorLoader) {
+			final boolean isCursorEmpty = cursor.getCount() == 0;
+			if (isCursorEmpty){
+				setProgressBarIndeterminate(false);
+				return;
+			}
+			
+			final int stateColumnIndex = cursor.getColumnIndex(PivotalTasksTable.Columns.STATE);
+			final String state = cursor.getString(stateColumnIndex);
+
+			if (PivotalTasksTable.State.SUCCESS.equals(state))
+				setProgressBarIndeterminate(false);
+			else if (PivotalTasksTable.State.FAIL.equals(state)) {
+				setProgressBarIndeterminate(false);
+				Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
+			} else if (PivotalTasksTable.State.RUNNING.equals(state))
+				setProgressBarIndeterminate(true);
+		}
 	}
 
 	@Override
 	public void onLoaderReset(final Loader<Cursor> loader) {
 		mListView.setAdapter(null);
-	};
+	}
+
 }

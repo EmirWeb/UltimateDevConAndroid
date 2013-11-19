@@ -3,9 +3,11 @@ package pivotal.architecture.providers;
 import java.util.Locale;
 
 import pivotal.architecture.PivotalApplication;
-import pivotal.workshop.database.Database;
-import pivotal.workshop.database.PivotalTable;
-import pivotal.workshop.database.PivotalView;
+import pivotal.architecture.services.PivotalService;
+import pivotal.workshop.database.PivotalDatabase;
+import pivotal.workshop.database.PivotalPeopleTable;
+import pivotal.workshop.database.PivotalPeopleView;
+import pivotal.workshop.database.PivotalTasksTable;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -23,6 +25,7 @@ public class PivotalContentProvider extends ContentProvider {
 	private static SQLiteDatabase sDatabase;
 	public static final String AUTHORITY = "pivotal.authority";
 	public static final String CONTENT = "content://";
+	public static final String TASK_URI = "taskUri";
 	public static Uri sMyFirstDatasetURI;
 
 	private final UriMatcher mURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -30,7 +33,7 @@ public class PivotalContentProvider extends ContentProvider {
 	protected static synchronized SQLiteDatabase getDatabase(final Context context) {
 		Log.d(PivotalApplication.DEBUG_TAG, "getDatabase");
 		if (sDatabase == null) {
-			final Database database = new Database(context, PIVOTAL_DATABASE);
+			final PivotalDatabase database = new PivotalDatabase(context, PIVOTAL_DATABASE);
 			sDatabase = database.getWritableDatabase();
 		}
 		return sDatabase;
@@ -42,12 +45,14 @@ public class PivotalContentProvider extends ContentProvider {
 
 	private String getTableName(final Uri uri) {
 		Log.d(PivotalApplication.DEBUG_TAG, "getTableName uri: " + uri);
-		int match = mURIMatcher.match(uri);
+		final int match = mURIMatcher.match(uri);
 		switch (match) {
-		case PivotalTable.CODE:
-			return PivotalTable.TABLE_NAME;
-		case PivotalView.CODE:
-			return PivotalView.VIEW_NAME;
+		case PivotalPeopleTable.CODE:
+			return PivotalPeopleTable.TABLE_NAME;
+		case PivotalPeopleView.CODE:
+			return PivotalPeopleView.VIEW_NAME;
+		case PivotalTasksTable.CODE:
+			return PivotalTasksTable.TABLE_NAME;
 		}
 		return null;
 	}
@@ -75,6 +80,18 @@ public class PivotalContentProvider extends ContentProvider {
 	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 		Log.d(PivotalApplication.DEBUG_TAG, "query uri: " + uri);
 		final Cursor cursor = getDatabase().query(getTableName(uri), projection, selection, selectionArgs, sortOrder, null, null);
+
+		// Launch task
+		final int match = mURIMatcher.match(uri);
+		switch (match) {
+		case PivotalTasksTable.CODE:
+			final String uriString = uri.getQueryParameter(TASK_URI);
+			if (uriString != null) {
+				final Uri taskUri = Uri.parse(uriString);
+				PivotalService.startTask(getContext(), taskUri);
+			}
+		}
+
 		return cursor;
 	}
 
@@ -87,8 +104,9 @@ public class PivotalContentProvider extends ContentProvider {
 	@Override
 	public boolean onCreate() {
 		Log.d(PivotalApplication.DEBUG_TAG, "onCreate");
-		mURIMatcher.addURI(AUTHORITY, PivotalTable.URI_PATH, PivotalTable.CODE);
-		mURIMatcher.addURI(AUTHORITY, PivotalView.URI_PATH, PivotalView.CODE);
+		mURIMatcher.addURI(AUTHORITY, PivotalPeopleTable.URI_PATH, PivotalPeopleTable.CODE);
+		mURIMatcher.addURI(AUTHORITY, PivotalPeopleView.URI_PATH, PivotalPeopleView.CODE);
+		mURIMatcher.addURI(AUTHORITY, PivotalTasksTable.URI_PATH, PivotalTasksTable.CODE);
 		return true;
 	}
 

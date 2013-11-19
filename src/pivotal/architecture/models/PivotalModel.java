@@ -1,62 +1,56 @@
 package pivotal.architecture.models;
 
+import com.google.gson.annotations.SerializedName;
+
 import android.content.ContentValues;
 
 public class PivotalModel {
-	
-	private int P_Id;
-	private String LastName;
-	private String FirstName;
-	private String Address;
-	private String City;
 
-	public int getP_Id() {
-		return P_Id;
+	public static final class Keys {
+		public static final String LAST_NAME = "lastName";
+		public static final String FIRST_NAME = "firstName";
+		public static final String ADDRESS = "address";
+		public static final String CITY = "city";
 	}
 
-	public void setP_Id(int p_Id) {
-		P_Id = p_Id;
+	@SerializedName(Keys.LAST_NAME)
+	private final String mLastName;
+	@SerializedName(Keys.FIRST_NAME)
+	private final String mFirstName;
+	@SerializedName(Keys.ADDRESS)
+	private final String mAddress;
+	@SerializedName(Keys.CITY)
+	private final String mCity;
+
+	public PivotalModel(final String lastName, final String firstName, final String address, final String city) {
+		mLastName = lastName;
+		mFirstName = firstName;
+		mAddress = address;
+		mCity = city;
 	}
 
 	public String getLastName() {
-		return LastName;
-	}
-
-	public void setLastName(String lastName) {
-		LastName = lastName;
+		return mLastName;
 	}
 
 	public String getFirstName() {
-		return FirstName;
-	}
-
-	public void setFirstName(String firstName) {
-		FirstName = firstName;
+		return mFirstName;
 	}
 
 	public String getAddress() {
-		return Address;
-	}
-
-	public void setAddress(String address) {
-		Address = address;
+		return mAddress;
 	}
 
 	public String getCity() {
-		return City;
-	}
-
-	public void setCity(String city) {
-		City = city;
+		return mCity;
 	}
 
 	public ContentValues getcontentValues() {
 		final ContentValues value = new ContentValues();
-		value.put("P_ID", getP_Id());
-		value.put("FirstName", getFirstName());
-		value.put("LastName", getLastName());
-		value.put("Address", getAddress());
-		value.put("City", getCity());
+		value.put("mFirstName", getFirstName());
+		value.put("mLastName", getLastName());
+		value.put("mAddress", getAddress());
+		value.put("mCity", getCity());
 		return value;
 	}
 

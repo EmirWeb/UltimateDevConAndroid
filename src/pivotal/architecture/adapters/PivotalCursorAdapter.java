@@ -1,7 +1,7 @@
 package pivotal.architecture.adapters;
 
 import pivotal.architecture.R;
-import pivotal.workshop.database.PivotalTable;
+import pivotal.workshop.database.PivotalPeopleTable;
 import android.content.Context;
 import android.database.Cursor;
 import android.view.LayoutInflater;
@@ -48,10 +48,10 @@ public class PivotalCursorAdapter extends CursorAdapter {
 
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
-		bindTextView(view, R.id.list_item_activity_pivotal_first_name, cursor, PivotalTable.Columns.FIRST_NAME);
-		bindTextView(view, R.id.list_item_activity_pivotal_address, cursor, PivotalTable.Columns.ADDRESS);
-		bindTextView(view, R.id.list_item_activity_pivotal_city, cursor, PivotalTable.Columns.CITY);
-		bindTextView(view, R.id.list_item_activity_pivotal_last_name, cursor, PivotalTable.Columns.LAST_NAME);
+		bindTextView(view, R.id.list_item_activity_pivotal_first_name, cursor, PivotalPeopleTable.Columns.FIRST_NAME);
+		bindTextView(view, R.id.list_item_activity_pivotal_address, cursor, PivotalPeopleTable.Columns.ADDRESS);
+		bindTextView(view, R.id.list_item_activity_pivotal_city, cursor, PivotalPeopleTable.Columns.CITY);
+		bindTextView(view, R.id.list_item_activity_pivotal_last_name, cursor, PivotalPeopleTable.Columns.LAST_NAME);
 	}
 	
 	private void bindTextView(final View view, final int resourceId, final Cursor cursor, final String columnName){
