@@ -12,11 +12,11 @@ import android.util.Log;
 public abstract class PivotalTask implements Runnable {
 
 	private final Context mContext;
-	private final Uri mUri;
+	private final Uri mTaskId;
 
-	public PivotalTask(final Context context, final Uri uri) {
+	public PivotalTask(final Context context, final Uri taskId) {
 		mContext = context;
-		mUri = uri;
+		mTaskId = taskId;
 	}
 
 	public Context getContext() {
@@ -24,7 +24,7 @@ public abstract class PivotalTask implements Runnable {
 	}
 
 	public Uri getUri() {
-		return mUri;
+		return mTaskId;
 	}
 
 	@Override
@@ -43,16 +43,16 @@ public abstract class PivotalTask implements Runnable {
 	private void notifyRunning() {
 		final ContentResolver contentResolver = getContext().getContentResolver();
 		final String whereClause = PivotalTasksTable.Columns.TASK_ID + "=? AND " + PivotalTasksTable.Columns.STATE + "<>?";
-		final String[] whereArguments = new String[] { mUri.toString(), PivotalTasksTable.State.RUNNING };
+		final String[] whereArguments = new String[] { mTaskId.toString(), PivotalTasksTable.State.RUNNING };
 		final ContentValues contentValues = new ContentValues();
 		contentValues.put(PivotalTasksTable.Columns.STATE, PivotalTasksTable.State.RUNNING);
-		contentValues.put(PivotalTasksTable.Columns.TASK_ID, mUri.toString());
+		contentValues.put(PivotalTasksTable.Columns.TASK_ID, mTaskId.toString());
 		contentValues.put(PivotalTasksTable.Columns.TIME, System.currentTimeMillis());
 		// THE FOLLOWING NEEDS TO BE ATOMIC
 		final int rows = contentResolver.update(PivotalTasksTable.URI, contentValues, whereClause, whereArguments);
 		if (rows == 0) {
 			final String queryWhereClause = PivotalTasksTable.Columns.TASK_ID + "=? AND " + PivotalTasksTable.Columns.STATE + "=?";
-			final String[] queryWhereArguments = new String[] { mUri.toString(), PivotalTasksTable.State.RUNNING };
+			final String[] queryWhereArguments = new String[] { mTaskId.toString(), PivotalTasksTable.State.RUNNING };
 
 			final Cursor cursor = contentResolver.query(PivotalTasksTable.URI, null, queryWhereClause, queryWhereArguments, null);
 			try {
@@ -80,10 +80,10 @@ public abstract class PivotalTask implements Runnable {
 	private void notifyState(final String state) {
 		final ContentResolver contentResolver = getContext().getContentResolver();
 		final String whereClause = PivotalTasksTable.Columns.TASK_ID + "=?";
-		final String[] whereArguments = new String[] { mUri.toString() };
+		final String[] whereArguments = new String[] { mTaskId.toString() };
 		final ContentValues contentValues = new ContentValues();
 		contentValues.put(PivotalTasksTable.Columns.STATE, state);
-		contentValues.put(PivotalTasksTable.Columns.TASK_ID, mUri.toString());
+		contentValues.put(PivotalTasksTable.Columns.TASK_ID, mTaskId.toString());
 		contentValues.put(PivotalTasksTable.Columns.TIME, System.currentTimeMillis());
 		contentResolver.update(PivotalTasksTable.URI, contentValues, whereClause, whereArguments);
 		contentResolver.notifyChange(PivotalTasksTable.URI, null);

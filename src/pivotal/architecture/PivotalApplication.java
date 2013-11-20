@@ -45,6 +45,9 @@ public class PivotalApplication extends Application {
 				jsonWriter = new JsonWriter(outputStreamWriter);
 				jsonWriter.beginObject();
 				
+				jsonWriter.name(PivotalPeopleModel.Keys.ID);
+				jsonWriter.value(id);
+				
 				jsonWriter.name(PivotalPeopleModel.Keys.ADDRESS);
 				jsonWriter.value("45 Madison Ave.");
 				
