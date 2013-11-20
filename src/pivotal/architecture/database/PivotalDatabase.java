@@ -8,7 +8,7 @@ import android.util.Log;
 
 public class PivotalDatabase extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 5;
+	private static final int DATABASE_VERSION = 7;
 
 	public PivotalDatabase(Context context, String name) {
 		super(context, name, null, DATABASE_VERSION);
@@ -17,6 +17,9 @@ public class PivotalDatabase extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(final SQLiteDatabase db) {
 		Log.d(PivotalApplication.DEBUG_TAG, "onCreate PivotalDatabase");
+		db.execSQL(PivotalCreatePeopleTable.DROP);
+		db.execSQL(PivotalCreatePeopleTable.CREATE);
+		
 		db.execSQL(PivotalPeopleTable.DROP);
 		db.execSQL(PivotalPeopleTable.CREATE);
 		db.execSQL(PivotalPeopleTable.DATA_CREATE);

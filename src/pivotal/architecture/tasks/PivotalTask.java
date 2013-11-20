@@ -48,6 +48,7 @@ public abstract class PivotalTask implements Runnable {
 		contentValues.put(PivotalTasksTable.Columns.STATE, PivotalTasksTable.State.RUNNING);
 		contentValues.put(PivotalTasksTable.Columns.TASK_ID, mTaskId.toString());
 		contentValues.put(PivotalTasksTable.Columns.TIME, System.currentTimeMillis());
+		
 		// THE FOLLOWING NEEDS TO BE ATOMIC
 		final int rows = contentResolver.update(PivotalTasksTable.URI, contentValues, whereClause, whereArguments);
 		if (rows == 0) {

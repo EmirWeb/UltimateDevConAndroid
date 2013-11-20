@@ -1,19 +1,22 @@
 package pivotal.architecture.activities;
 
-import pivotal.architecture.PivotalApplication;
 import pivotal.architecture.R;
 import pivotal.architecture.adapters.PivotalCursorAdapter;
 import pivotal.architecture.callbacks.PivotalLoaderCallbacksListener;
+import pivotal.architecture.database.PivotalCreatePeopleTable;
 import pivotal.architecture.database.PivotalPeopleView;
 import pivotal.architecture.database.PivotalTasksTable;
-import pivotal.architecture.loaders.PivotalPeopleViewLoaderCallbacks;
 import pivotal.architecture.loaders.PivotalPeopleTableTaskCursorLoader;
+import pivotal.architecture.loaders.PivotalPeopleViewLoaderCallbacks;
+import pivotal.architecture.services.PivotalUploadService;
 import android.app.Activity;
+import android.content.ContentValues;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.View;
 import android.view.Window;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -21,6 +24,7 @@ import android.widget.Toast;
 public class PivotalActivity extends Activity implements PivotalLoaderCallbacksListener {
 
 	private ListView mListView;
+	private PivotalCursorAdapter mPivotalCursorAdapter;
 	private PivotalPeopleViewLoaderCallbacks mPeopleCursorLoader;
 	private PivotalPeopleTableTaskCursorLoader mPivotalPeopleTaskCursorLoader;
 
@@ -37,14 +41,12 @@ public class PivotalActivity extends Activity implements PivotalLoaderCallbacksL
 	@Override
 	protected void onStart() {
 		super.onStart();
-		Log.d(PivotalApplication.DEBUG_TAG, "onStart");
 		mPeopleCursorLoader.onStart(getApplicationContext());
 		mPivotalPeopleTaskCursorLoader.onStart(getApplicationContext());
 	}
 
 	@Override
 	protected void onStop() {
-		Log.d(PivotalApplication.DEBUG_TAG, "onStop");
 		mPeopleCursorLoader.onStop(getApplicationContext());
 		mPivotalPeopleTaskCursorLoader.onStop(getApplicationContext());
 		super.onStop();
@@ -52,35 +54,50 @@ public class PivotalActivity extends Activity implements PivotalLoaderCallbacksL
 
 	@Override
 	public void onLoadFinished(final Uri uri, final Cursor cursor) {
-		Log.d(PivotalApplication.DEBUG_TAG, "uri: " + uri.toString() + " count: " +  cursor.getCount());
 		if (uri.equals(PivotalPeopleView.URI)) {
-			
-			final PivotalCursorAdapter pivotalCursorAdapter = new PivotalCursorAdapter(getApplicationContext(), cursor);
-			mListView.setAdapter(pivotalCursorAdapter);
+			if (mPivotalCursorAdapter == null) {
+				mPivotalCursorAdapter = new PivotalCursorAdapter(getApplicationContext(), cursor);
+				mListView.setAdapter(mPivotalCursorAdapter);
+			} else
+				mPivotalCursorAdapter.swapCursor(cursor);
 		} else {
 			final boolean isCursorEmpty = cursor.getCount() == 0;
-			if (isCursorEmpty){
-				setProgressBarIndeterminate(true);
+			if (isCursorEmpty) {
+				setProgressBarIndeterminateVisibility(true);
 				return;
 			}
-			
+
 			final int stateColumnIndex = cursor.getColumnIndex(PivotalTasksTable.Columns.STATE);
 			final String state = cursor.getString(stateColumnIndex);
-			Log.d(PivotalApplication.DEBUG_TAG, "state: " + state);
 
 			if (PivotalTasksTable.State.SUCCESS.equals(state))
-				setProgressBarIndeterminate(false);
+				setProgressBarIndeterminateVisibility(false);
 			else if (PivotalTasksTable.State.FAIL.equals(state)) {
-				setProgressBarIndeterminate(false);
+				setProgressBarIndeterminateVisibility(false);
 				Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
 			} else if (PivotalTasksTable.State.RUNNING.equals(state))
-				setProgressBarIndeterminate(true);
+				setProgressBarIndeterminateVisibility(true);
 		}
 	}
 
 	@Override
 	public void onLoaderReset(final Loader<Cursor> loader) {
 		mListView.setAdapter(null);
+	}
+
+	public void onCreatePerson(final View view) {
+		final ContentValues contentValues = new ContentValues();
+		contentValues.put(PivotalCreatePeopleTable.Columns.ADDRESS, "SOME ADDRESS");
+		contentValues.put(PivotalCreatePeopleTable.Columns.LAST_NAME, "SOME LAST_NAME");
+		contentValues.put(PivotalCreatePeopleTable.Columns.FIRST_NAME, "SOME FIRST_NAME");
+		contentValues.put(PivotalCreatePeopleTable.Columns.CITY, "SOME CITY");
+		contentValues.put(PivotalCreatePeopleTable.Columns.STATE, PivotalCreatePeopleTable.States.PENDING_UPLOAD);
+
+		final Uri uri = getContentResolver().insert(PivotalCreatePeopleTable.URI, contentValues);
+		
+		getContentResolver().notifyChange(PivotalPeopleView.URI, null);
+		startService(new Intent(getApplicationContext(), PivotalUploadService.class));
+
 	}
 
 }

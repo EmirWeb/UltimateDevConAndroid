@@ -1,0 +1,5 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <string name="activity_pivotal_button">Create Person</string>
+    
+</resources>

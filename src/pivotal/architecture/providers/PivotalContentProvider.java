@@ -1,16 +1,21 @@
 package pivotal.architecture.providers;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
+import pivotal.architecture.database.PivotalCreatePeopleTable;
 import pivotal.architecture.database.PivotalDatabase;
 import pivotal.architecture.database.PivotalPeopleTable;
 import pivotal.architecture.database.PivotalPeopleView;
 import pivotal.architecture.database.PivotalTasksTable;
 import pivotal.architecture.services.PivotalService;
 import android.content.ContentProvider;
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.OperationApplicationException;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -22,10 +27,11 @@ public class PivotalContentProvider extends ContentProvider {
 	private static final String MIME_TYPE = "pivotal";
 	private static SQLiteDatabase sDatabase;
 	private static final long STALE_DATA_THRESHOLD = 1000 * 30; // 30 seconds
-	
+
 	public static final String AUTHORITY = "pivotal.authority";
 	public static final String CONTENT = "content://";
 	public static final String TASK_URI = "taskUri";
+	public static final String FORCE_REQUEST = "forceRequest";
 
 	private final UriMatcher mURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -50,6 +56,8 @@ public class PivotalContentProvider extends ContentProvider {
 			return PivotalPeopleView.VIEW_NAME;
 		case PivotalTasksTable.CODE:
 			return PivotalTasksTable.TABLE_NAME;
+		case PivotalCreatePeopleTable.CODE:
+			return PivotalCreatePeopleTable.TABLE_NAME;
 		}
 		return null;
 	}
@@ -94,7 +102,10 @@ public class PivotalContentProvider extends ContentProvider {
 				launchNetworkRequest = duration > STALE_DATA_THRESHOLD;
 			}
 			final String uriString = uri.getQueryParameter(TASK_URI);
-			launchNetworkRequest = launchNetworkRequest && uriString != null;
+			final String forceRequestString = uri.getQueryParameter(FORCE_REQUEST);
+			final boolean forceRequest = forceRequestString != null && Boolean.parseBoolean(forceRequestString);
+			launchNetworkRequest = forceRequest || launchNetworkRequest && uriString != null;
+
 			if (launchNetworkRequest) {
 				final Uri taskUri = Uri.parse(uriString);
 				PivotalService.startTask(getContext(), taskUri);
@@ -113,7 +124,21 @@ public class PivotalContentProvider extends ContentProvider {
 		mURIMatcher.addURI(AUTHORITY, PivotalPeopleTable.URI_PATH, PivotalPeopleTable.CODE);
 		mURIMatcher.addURI(AUTHORITY, PivotalPeopleView.URI_PATH, PivotalPeopleView.CODE);
 		mURIMatcher.addURI(AUTHORITY, PivotalTasksTable.URI_PATH, PivotalTasksTable.CODE);
+		mURIMatcher.addURI(AUTHORITY, PivotalCreatePeopleTable.URI_PATH, PivotalCreatePeopleTable.CODE);
 		return true;
+	}
+
+	@Override
+	public ContentProviderResult[] applyBatch(ArrayList<ContentProviderOperation> operations) throws OperationApplicationException {
+		getDatabase().beginTransaction();
+		try {
+			final ContentProviderResult[] contentProviderResults = super.applyBatch(operations);
+			getDatabase().setTransactionSuccessful();
+			return contentProviderResults;
+		} finally {
+			getDatabase().endTransaction();
+		}
+
 	}
 
 }

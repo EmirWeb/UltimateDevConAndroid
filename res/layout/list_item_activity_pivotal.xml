@@ -33,4 +33,13 @@
         android:layout_alignParentRight="true"
         android:layout_below="@id/list_item_activity_pivotal_address" />
 
+    <ImageView
+        android:id="@+id/list_item_activity_pivotal_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:contentDescription="@string/list_item_activity_pivotal_state_content_description"
+        android:src="@android:drawable/ic_menu_save"
+        android:visibility="gone" />
+
 </RelativeLayout>

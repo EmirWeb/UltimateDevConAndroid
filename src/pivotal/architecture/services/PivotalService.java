@@ -22,7 +22,6 @@ public class PivotalService extends Service {
 	}
 
 	public static void startTask(final Context context, final Uri uri){
-		Log.d(PivotalApplication.DEBUG_TAG, "StartTask uri: " + uri.toString());
 		final String uriString = uri.toString();
 		
 		final Intent intent = new Intent(context, PivotalService.class);
@@ -38,7 +37,6 @@ public class PivotalService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		Log.d(PivotalApplication.DEBUG_TAG, "onStartCommand intent: " + intent);
 		handleOnStart(intent);
 		return super.onStartCommand(intent, flags, startId);
 	}

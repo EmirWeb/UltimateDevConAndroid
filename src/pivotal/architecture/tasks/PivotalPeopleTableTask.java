@@ -12,6 +12,7 @@ import pivotal.architecture.database.PivotalPeopleView;
 import pivotal.architecture.models.PivotalPeopleModel;
 import pivotal.architecture.providers.PivotalContentProvider;
 import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -39,7 +40,6 @@ public class PivotalPeopleTableTask extends PivotalTask {
 
 		final Collection<ContentValues> contentValueList = new ArrayList<ContentValues>(files.length);
 		for (final File file : files) {
-			final String filename = file.getName();
 			if (!file.isDirectory()) {
 				FileInputStream fileInputStream = null;
 				InputStreamReader inputStreamReader = null;
@@ -82,7 +82,7 @@ public class PivotalPeopleTableTask extends PivotalTask {
 		}
 
 		final ContentResolver contentResolver = getContext().getContentResolver();
-		contentResolver.applyBatch(PivotalContentProvider.AUTHORITY, contentProviderOperations);
+		final ContentProviderResult[] contentProviderResults = contentResolver.applyBatch(PivotalContentProvider.AUTHORITY, contentProviderOperations);
 		contentResolver.notifyChange(PivotalPeopleView.URI, null);
 	}
 }

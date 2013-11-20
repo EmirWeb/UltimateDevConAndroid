@@ -35,6 +35,11 @@
             android:name="pivotal.architecture.services.PivotalService"
             android:enabled="true"
             android:exported="false" />
+        
+          <service
+            android:name="pivotal.architecture.services.PivotalUploadService"
+            android:enabled="true"
+            android:exported="false" />
     </application>
 
 </manifest>
