@@ -2,12 +2,11 @@ package pivotal.architecture.providers;
 
 import java.util.Locale;
 
-import pivotal.architecture.PivotalApplication;
+import pivotal.architecture.database.PivotalDatabase;
+import pivotal.architecture.database.PivotalPeopleTable;
+import pivotal.architecture.database.PivotalPeopleView;
+import pivotal.architecture.database.PivotalTasksTable;
 import pivotal.architecture.services.PivotalService;
-import pivotal.workshop.database.PivotalDatabase;
-import pivotal.workshop.database.PivotalPeopleTable;
-import pivotal.workshop.database.PivotalPeopleView;
-import pivotal.workshop.database.PivotalTasksTable;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -16,22 +15,21 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.util.Log;
 
 public class PivotalContentProvider extends ContentProvider {
 
 	private static final String PIVOTAL_DATABASE = "MyDatabase";
 	private static final String MIME_TYPE = "pivotal";
 	private static SQLiteDatabase sDatabase;
+	private static final long STALE_DATA_THRESHOLD = 1000 * 30; // 30 seconds
+	
 	public static final String AUTHORITY = "pivotal.authority";
 	public static final String CONTENT = "content://";
 	public static final String TASK_URI = "taskUri";
-	public static Uri sMyFirstDatasetURI;
 
 	private final UriMatcher mURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
 	protected static synchronized SQLiteDatabase getDatabase(final Context context) {
-		Log.d(PivotalApplication.DEBUG_TAG, "getDatabase");
 		if (sDatabase == null) {
 			final PivotalDatabase database = new PivotalDatabase(context, PIVOTAL_DATABASE);
 			sDatabase = database.getWritableDatabase();
@@ -44,7 +42,6 @@ public class PivotalContentProvider extends ContentProvider {
 	}
 
 	private String getTableName(final Uri uri) {
-		Log.d(PivotalApplication.DEBUG_TAG, "getTableName uri: " + uri);
 		final int match = mURIMatcher.match(uri);
 		switch (match) {
 		case PivotalPeopleTable.CODE:
@@ -78,21 +75,31 @@ public class PivotalContentProvider extends ContentProvider {
 
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-		Log.d(PivotalApplication.DEBUG_TAG, "query uri: " + uri);
 		final Cursor cursor = getDatabase().query(getTableName(uri), projection, selection, selectionArgs, sortOrder, null, null);
 
-		// Launch task
+		launchTask(uri, cursor);
+
+		return cursor;
+	}
+
+	private void launchTask(final Uri uri, final Cursor cursor) {
 		final int match = mURIMatcher.match(uri);
 		switch (match) {
 		case PivotalTasksTable.CODE:
+			boolean launchNetworkRequest = true;
+			if (cursor.moveToFirst()) {
+				final int timeColumnIndex = cursor.getColumnIndex(PivotalTasksTable.Columns.TIME);
+				final long time = cursor.getLong(timeColumnIndex);
+				final long duration = Math.abs(System.currentTimeMillis() - time);
+				launchNetworkRequest = duration > STALE_DATA_THRESHOLD;
+			}
 			final String uriString = uri.getQueryParameter(TASK_URI);
-			if (uriString != null) {
+			launchNetworkRequest = launchNetworkRequest && uriString != null;
+			if (launchNetworkRequest) {
 				final Uri taskUri = Uri.parse(uriString);
 				PivotalService.startTask(getContext(), taskUri);
 			}
 		}
-
-		return cursor;
 	}
 
 	@Override
@@ -103,7 +110,6 @@ public class PivotalContentProvider extends ContentProvider {
 
 	@Override
 	public boolean onCreate() {
-		Log.d(PivotalApplication.DEBUG_TAG, "onCreate");
 		mURIMatcher.addURI(AUTHORITY, PivotalPeopleTable.URI_PATH, PivotalPeopleTable.CODE);
 		mURIMatcher.addURI(AUTHORITY, PivotalPeopleView.URI_PATH, PivotalPeopleView.CODE);
 		mURIMatcher.addURI(AUTHORITY, PivotalTasksTable.URI_PATH, PivotalTasksTable.CODE);

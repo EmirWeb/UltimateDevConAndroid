@@ -1,4 +1,4 @@
-package pivotal.workshop.database;
+package pivotal.architecture.database;
 
 import pivotal.architecture.providers.PivotalContentProvider;
 import android.net.Uri;
@@ -6,7 +6,7 @@ import android.net.Uri;
 public class PivotalTasksTable {
 
 	public static final class Columns {
-		public static final String URI = "uri";
+		public static final String TASK_ID = "taskId";
 		public static final String STATE = "state";
 		public static final String TIME = "time";
 	}
@@ -22,7 +22,7 @@ public class PivotalTasksTable {
 	public static final String DROP = "DROP TABLE IF EXISTS "+ TABLE_NAME;
 	
 	public static final String CREATE = "CREATE TABLE " + TABLE_NAME + " ( " + 
-	Columns.URI + " TEXT, " + 
+	Columns.TASK_ID + " TEXT, " + 
 	Columns.STATE + " TEXT, " + 
 	Columns.TIME + " INTEGER " + ");";
 

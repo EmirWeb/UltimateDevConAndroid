@@ -1,7 +1,7 @@
 package pivotal.architecture.adapters;
 
 import pivotal.architecture.R;
-import pivotal.workshop.database.PivotalPeopleTable;
+import pivotal.architecture.database.PivotalPeopleTable;
 import android.content.Context;
 import android.database.Cursor;
 import android.view.LayoutInflater;
@@ -34,15 +34,15 @@ public class PivotalCursorAdapter extends CursorAdapter {
 		final LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		final View view = layoutInflater.inflate(R.layout.list_item_activity_pivotal, null);
 
-		optimze(view, R.id.list_item_activity_pivotal_address);
-		optimze(view, R.id.list_item_activity_pivotal_city);
-		optimze(view, R.id.list_item_activity_pivotal_first_name);
-		optimze(view, R.id.list_item_activity_pivotal_last_name);
+		optimize(view, R.id.list_item_activity_pivotal_address);
+		optimize(view, R.id.list_item_activity_pivotal_city);
+		optimize(view, R.id.list_item_activity_pivotal_first_name);
+		optimize(view, R.id.list_item_activity_pivotal_last_name);
 
 		return view;
 	}
 
-	private void optimze(final View view, final int resourceId) {
+	private void optimize(final View view, final int resourceId) {
 		view.setTag(resourceId, view.findViewById(resourceId));
 	}
 

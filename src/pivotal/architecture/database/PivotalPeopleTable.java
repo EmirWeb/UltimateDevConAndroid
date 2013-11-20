@@ -1,16 +1,16 @@
-package pivotal.workshop.database;
+package pivotal.architecture.database;
 
-import pivotal.architecture.models.PivotalModel;
+import pivotal.architecture.models.PivotalPeopleModel;
 import pivotal.architecture.providers.PivotalContentProvider;
 import android.net.Uri;
 
 public class PivotalPeopleTable {
 
 	public static final class Columns {
-		public static final String LAST_NAME = PivotalModel.Keys.LAST_NAME;
-		public static final String FIRST_NAME = PivotalModel.Keys.FIRST_NAME;
-		public static final String ADDRESS = PivotalModel.Keys.ADDRESS;
-		public static final String CITY = PivotalModel.Keys.CITY;
+		public static final String LAST_NAME = PivotalPeopleModel.Keys.LAST_NAME;
+		public static final String FIRST_NAME = PivotalPeopleModel.Keys.FIRST_NAME;
+		public static final String ADDRESS = PivotalPeopleModel.Keys.ADDRESS;
+		public static final String CITY = PivotalPeopleModel.Keys.CITY;
 	}
 
 	public static String TABLE_NAME = "people";

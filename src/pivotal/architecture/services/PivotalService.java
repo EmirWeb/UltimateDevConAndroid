@@ -3,8 +3,8 @@ package pivotal.architecture.services;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import pivotal.architecture.PivotalApplication;
+import pivotal.architecture.database.PivotalPeopleTable;
 import pivotal.architecture.tasks.PivotalPeopleTableTask;
-import pivotal.workshop.database.PivotalPeopleTable;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;

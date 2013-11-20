@@ -1,4 +1,4 @@
-package pivotal.workshop.database;
+package pivotal.architecture.database;
 
 import pivotal.architecture.providers.PivotalContentProvider;
 import android.net.Uri;

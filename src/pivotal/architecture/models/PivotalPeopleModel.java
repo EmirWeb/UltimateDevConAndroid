@@ -1,10 +1,13 @@
 package pivotal.architecture.models;
 
+import pivotal.architecture.database.PivotalPeopleTable;
+import pivotal.architecture.database.PivotalTasksTable;
+
 import com.google.gson.annotations.SerializedName;
 
 import android.content.ContentValues;
 
-public class PivotalModel {
+public class PivotalPeopleModel {
 
 	public static final class Keys {
 		public static final String LAST_NAME = "lastName";
@@ -22,7 +25,7 @@ public class PivotalModel {
 	@SerializedName(Keys.CITY)
 	private final String mCity;
 
-	public PivotalModel(final String lastName, final String firstName, final String address, final String city) {
+	public PivotalPeopleModel(final String lastName, final String firstName, final String address, final String city) {
 		mLastName = lastName;
 		mFirstName = firstName;
 		mAddress = address;
@@ -47,14 +50,14 @@ public class PivotalModel {
 
 	public ContentValues getcontentValues() {
 		final ContentValues value = new ContentValues();
-		value.put("mFirstName", getFirstName());
-		value.put("mLastName", getLastName());
-		value.put("mAddress", getAddress());
-		value.put("mCity", getCity());
+		value.put(PivotalPeopleTable.Columns.FIRST_NAME, getFirstName());
+		value.put(PivotalPeopleTable.Columns.LAST_NAME, getLastName());
+		value.put(PivotalPeopleTable.Columns.ADDRESS, getAddress());
+		value.put(PivotalPeopleTable.Columns.CITY, getCity());
 		return value;
 	}
 
-	public static ContentValues getContentValues(PivotalModel item) {
+	public static ContentValues getContentValues(PivotalPeopleModel item) {
 		return item.getcontentValues();
 	}
 }

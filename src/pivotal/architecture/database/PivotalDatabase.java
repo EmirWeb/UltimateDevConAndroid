@@ -1,4 +1,4 @@
-package pivotal.workshop.database;
+package pivotal.architecture.database;
 
 import pivotal.architecture.PivotalApplication;
 import android.content.Context;
@@ -8,7 +8,7 @@ import android.util.Log;
 
 public class PivotalDatabase extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 4;
+	private static final int DATABASE_VERSION = 5;
 
 	public PivotalDatabase(Context context, String name) {
 		super(context, name, null, DATABASE_VERSION);
